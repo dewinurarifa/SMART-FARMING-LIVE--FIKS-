@@ -1,0 +1,441 @@
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   Smart Farming Dashboard
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+  <style>
+   body {
+      font-family: 'Inter', sans-serif;
+    }
+    button:focus {
+      outline: 2px solid #7B8BD4;
+      outline-offset: 2px;
+    }
+    .clickable {
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.2s ease;
+    }
+    .clickable:focus,
+    .clickable:hover {
+      background-color: rgba(123, 139, 212, 0.2);
+      border-radius: 0.5rem;
+      outline: none;
+    }
+  </style>
+ </head>
+ <body class="bg-[#F9FAFF] min-h-screen flex justify-center items-start p-4">
+  <div class="w-full max-w-5xl rounded-xl bg-white p-6 pt-8 shadow-md">
+   <header class="flex items-center justify-between mb-6 px-2 flex-wrap gap-4">
+    <nav class="flex justify-center space-x-12 w-full max-w-md md:max-w-none md:w-auto">
+     <a href="#" class="font-semibold text-[#7B8BD4] text-sm sm:text-base clickable focus:outline-none focus:ring-2 focus:ring-[#7B8BD4] rounded-md px-2 py-1" aria-current="page">Home</a>
+     <a href="#" class="font-semibold text-[#A3A9D1] text-sm sm:text-base clickable focus:outline-none focus:ring-2 focus:ring-[#7B8BD4] rounded-md px-2 py-1">K-Means</a>
+    </nav>
+    <button aria-label="Filter options" class="text-[#A3A9D1] text-xl clickable" onclick="alert('Filter options clicked')">
+     <i class="fas fa-sliders-h">
+     </i>
+    </button>
+   </header>
+   <section class="relative rounded-xl overflow-hidden bg-gradient-to-tr from-[#8B8EDC] via-[#B7B9E9] to-[#D9D9F3] p-6 flex flex-col justify-between h-56 mb-6">
+    <img alt="Greenhouse with strawberry plants inside, glass structure with sunlight filtering through, lush green leaves and ripe red strawberries" aria-hidden="true" class="absolute inset-0 w-full h-full object-cover opacity-30" height="224" src="https://storage.googleapis.com/a1aa/image/6f517d53-173e-4720-f3c4-307ccc99ed85.jpg" width="640"/>
+    <button aria-label="Latest temperature 24 degrees Celsius" class="flex items-center space-x-3 focus:outline-none clickable">
+     <i class="fas fa-thermometer-half text-white text-3xl">
+     </i>
+     <div class="flex flex-col text-white mt-2">
+      <span class="text-6xl font-light leading-none select-none" id="temp-latest">
+       24°
+      </span>
+      <span class="text-sm font-normal select-none" id="location-latest">
+       Greenhouse, Farm
+      </span>
+     </div>
+    </button>
+    <div class="absolute bottom-4 right-6 text-white text-xs font-light select-none text-right" id="datetime-latest">
+     <div>
+      Loading date &amp; time...
+     </div>
+    </div>
+   </section>
+   <section class="flex flex-col md:flex-row md:space-x-6 mb-6 px-2">
+    <div aria-label="Latest sensor readings" class="flex flex-col space-y-6 md:w-1/3 text-[#7B8BD4] text-xs font-semibold">
+     <button aria-label="Latest soil humidity percentage" class="flex items-center space-x-2 clickable">
+      <i class="fas fa-tint text-[#7B8BD4] text-sm">
+      </i>
+      <div>
+       <div>
+        Soil Humidity
+       </div>
+       <div class="font-normal text-[10px]" id="humidity-latest">
+        --%
+       </div>
+      </div>
+     </button>
+     <button aria-label="Latest soil pH value" class="flex items-center space-x-2 clickable">
+      <i class="fas fa-vial text-[#7B8BD4] text-sm">
+      </i>
+      <div>
+       <div>
+        Soil pH
+       </div>
+       <div class="font-normal text-[10px]" id="ph-latest">
+        --
+       </div>
+      </div>
+     </button>
+     <button aria-label="Latest temperature value" class="flex items-center space-x-2 clickable">
+      <i class="fas fa-thermometer-half text-[#7B8BD4] text-sm">
+      </i>
+      <div>
+       <div>
+        Temperature
+       </div>
+       <div class="font-normal text-[10px]" id="temperature-latest">
+        --°C
+       </div>
+      </div>
+     </button>
+     <section aria-label="Maintenance recommendation" class="bg-[#7B8BD4] rounded-xl p-4 mt-4 text-white text-xs font-semibold select-none px-4 clickable flex flex-col" id="recommendation-section" role="button" tabindex="0" style="max-width: 240px;">
+      <div class="flex items-center mb-3" id="recommendation-icon" style="width: 40px; height: 40px;">
+       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+        <path d="M12 22s-4-4-4-8a4 4 0 0 1 8 0c0 4-4 8-4 8z"></path>
+        <path d="M12 14v-4"></path>
+       </svg>
+      </div>
+      <h1 class="text-white text-sm font-bold mb-1" id="recommendation-title">Pemupukan</h1>
+      <p class="text-white text-xs" id="recommendation-desc">Kondisi tanah kurang nutrisi, lakukan pemupukan.</p>
+     </section>
+    </div>
+    <div aria-label="Daily sensor data chart" class="mt-10 md:mt-6 md:w-2/3 bg-white rounded-xl p-6 shadow-inner text-[#7B8BD4] text-xs font-semibold">
+     <div class="flex justify-between mb-2 px-2">
+      <button aria-label="Temperature tab" class="clickable text-[#7B8BD4] font-bold border-b-2 border-[#7B8BD4]" id="tab-temperature" type="button">
+       Temperature
+      </button>
+      <button aria-label="Humidity tab" class="clickable text-[#A3A9D1] font-semibold" id="tab-humidity" type="button">
+       Humidity
+      </button>
+      <button aria-label="Soil pH tab" class="clickable text-[#A3A9D1] font-semibold" id="tab-ph" type="button">
+       Soil pH
+      </button>
+     </div>
+     <svg aria-hidden="true" class="w-full h-40" fill="none" id="chart-svg" viewBox="0 0 350 160" xmlns="http://www.w3.org/2000/svg">
+     </svg>
+     <div class="grid grid-cols-7 text-center mt-2 px-2 text-[#7B8BD4] font-normal select-none" id="chart-labels">
+     </div>
+    </div>
+   </section>
+  </div>
+  <script type="module">
+   function createIcon(name) {
+      const ns = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(ns, 'svg');
+      svg.setAttribute('width', '40');
+      svg.setAttribute('height', '40');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('fill', 'none');
+      svg.setAttribute('stroke', 'currentColor');
+      svg.setAttribute('stroke-width', '2');
+      svg.setAttribute('stroke-linecap', 'round');
+      svg.setAttribute('stroke-linejoin', 'round');
+      svg.classList.add('text-white');
+
+      switch (name) {
+        case 'Optimal':
+          svg.innerHTML = `
+            <path d="M14 9V5a3 3 0 0 0-6 0v4"></path>
+            <path d="M5 15h14l-1.5 7H6.5L5 15z"></path>
+            <path d="M7 15v-4a2 2 0 0 1 2-2h2"></path>
+          `;
+          break;
+        case 'Penyiraman':
+          svg.innerHTML = `
+            <path d="M12 2C12 2 7 8 7 12a5 5 0 0 0 10 0c0-4-5-10-5-10z"></path>
+            <path d="M12 22v-4"></path>
+          `;
+          break;
+        case 'Pemupukan':
+          svg.innerHTML = `
+            <path d="M12 22s-4-4-4-8a4 4 0 0 1 8 0c0 4-4 8-4 8z"></path>
+            <path d="M12 14v-4"></path>
+          `;
+          break;
+        case 'Perlu Pengecekan':
+          svg.innerHTML = `
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          `;
+          break;
+        default:
+          svg.innerHTML = '';
+      }
+      return svg;
+    }
+
+    const demoData = [
+      {
+        created_at: '2024-06-10T12:00:00',
+        temperature: 22,
+        humidity: 40,
+        ph: 6.5,
+        Rekomendasi: 'Optimal',
+        Penjelasan: 'Tanaman dalam kondisi optimal, lanjutkan perawatan rutin.',
+      },
+      {
+        created_at: '2024-06-11T12:00:00',
+        temperature: 24,
+        humidity: 38,
+        ph: 6.4,
+        Rekomendasi: 'Penyiraman',
+        Penjelasan: 'Kelembapan tanah mulai menurun, lakukan penyiraman.',
+      },
+      {
+        created_at: '2024-06-12T12:00:00',
+        temperature: 23,
+        humidity: 42,
+        ph: 6.3,
+        Rekomendasi: 'Pemupukan',
+        Penjelasan: 'Kondisi tanah kurang nutrisi, lakukan pemupukan.',
+      },
+      {
+        created_at: '2024-06-13T12:00:00',
+        temperature: 25,
+        humidity: 35,
+        ph: 6.2,
+        Rekomendasi: 'Perlu Pengecekan',
+        Penjelasan: 'Periksa kondisi tanaman dan tanah secara menyeluruh.',
+      },
+      {
+        created_at: '2024-06-14T12:00:00',
+        temperature: 24,
+        humidity: 37,
+        ph: 6.4,
+        Rekomendasi: 'Optimal',
+        Penjelasan: 'Tanaman dalam kondisi optimal, lanjutkan perawatan rutin.',
+      },
+      {
+        created_at: '2024-06-15T12:00:00',
+        temperature: 22,
+        humidity: 39,
+        ph: 6.5,
+        Rekomendasi: 'Penyiraman',
+        Penjelasan: 'Kelembapan tanah mulai menurun, lakukan penyiraman.',
+      },
+      {
+        created_at: '2024-06-16T12:00:00',
+        temperature: 23,
+        humidity: 41,
+        ph: 6.3,
+        Rekomendasi: 'Pemupukan',
+        Penjelasan: 'Kondisi tanah kurang nutrisi, lakukan pemupukan.',
+      },
+    ];
+
+    function getDayShort(dateStr) {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+    }
+
+    function getTime(dateStr) {
+      const d = new Date(dateStr);
+      return d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    const svg = document.getElementById('chart-svg');
+    const labelsContainer = document.getElementById('chart-labels');
+
+    const tabTemperature = document.getElementById('tab-temperature');
+    const tabHumidity = document.getElementById('tab-humidity');
+    const tabPh = document.getElementById('tab-ph');
+
+    const tempLatest = document.getElementById('temp-latest');
+    const humidityLatest = document.getElementById('humidity-latest');
+    const phLatest = document.getElementById('ph-latest');
+    const locationLatest = document.getElementById('location-latest');
+    const datetimeLatest = document.getElementById('datetime-latest');
+
+    const recommendationIconContainer = document.getElementById('recommendation-icon');
+    const recommendationTitle = document.getElementById('recommendation-title');
+    const recommendationDesc = document.getElementById('recommendation-desc');
+
+    let currentMetric = 'temperature';
+
+    const metrics = {
+      temperature: {
+        label: 'Temperature (°C)',
+        unit: '°C',
+        color: '#7B8BD4',
+        min: 15,
+        max: 30,
+        iconClass: 'fas fa-thermometer-half',
+      },
+      humidity: {
+        label: 'Humidity (%)',
+        unit: '%',
+        color: '#4A90E2',
+        min: 20,
+        max: 60,
+        iconClass: 'fas fa-tint',
+      },
+      ph: {
+        label: 'Soil pH',
+        unit: '',
+        color: '#34D399',
+        min: 5.5,
+        max: 7,
+        iconClass: 'fas fa-vial',
+      },
+    };
+
+    function updateLatestData(data) {
+      if (!data) return;
+      tempLatest.textContent = `${data.temperature}°`;
+      humidityLatest.textContent = `${data.humidity}%`;
+      phLatest.textContent = data.ph.toFixed(2);
+      locationLatest.textContent = 'Greenhouse, Farm';
+      datetimeLatest.innerHTML = `
+        <div>${new Date(data.created_at).toLocaleDateString('id-ID', {
+          weekday: 'long',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        })}</div>
+        <div>${getTime(data.created_at)}</div>
+      `;
+      updateRecommendation(data.Rekomendasi, data.Penjelasan);
+    }
+
+    function updateRecommendation(recommendation, explanation) {
+      recommendationIconContainer.innerHTML = '';
+      const icon = createIcon(recommendation);
+      if (icon) {
+        icon.classList.add('mr-3', 'flex-shrink-0');
+        recommendationIconContainer.appendChild(icon);
+      }
+      recommendationTitle.textContent = recommendation || 'No Recommendation';
+      recommendationDesc.textContent = explanation || '';
+    }
+
+    function drawChart(metricKey) {
+      const metric = metrics[metricKey];
+      if (!metric) return;
+
+      while (svg.firstChild) {
+        svg.removeChild(svg.firstChild);
+      }
+      const width = 350;
+      const height = 160;
+      const paddingLeft = 20;
+      const paddingRight = 20;
+      const paddingTop = 30;
+      const paddingBottom = 40;
+
+      const pointsCount = demoData.length;
+      const spacingX = (width - paddingLeft - paddingRight) / (pointsCount - 1);
+
+      function mapY(value) {
+        const range = metric.max - metric.min;
+        const scaled = (value - metric.min) / range;
+        return height - paddingBottom - scaled * (height - paddingTop - paddingBottom);
+      }
+
+      let pathD = '';
+      demoData.forEach((d, i) => {
+        const x = paddingLeft + i * spacingX;
+        const y = mapY(d[metricKey]);
+        if (i === 0) {
+          pathD += `M${x.toFixed(2)} ${y.toFixed(2)}`;
+        } else {
+          pathD += ` L${x.toFixed(2)} ${y.toFixed(2)}`;
+        }
+      });
+
+      const path = document.createElementNS(svg.namespaceURI, 'path');
+      path.setAttribute('d', pathD);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', metric.color);
+      path.setAttribute('stroke-width', '3');
+      path.setAttribute('stroke-linejoin', 'round');
+      path.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(path);
+
+      demoData.forEach((d, i) => {
+        const x = paddingLeft + i * spacingX;
+        const y = mapY(d[metricKey]);
+        const circle = document.createElementNS(svg.namespaceURI, 'circle');
+        circle.setAttribute('cx', x.toFixed(2));
+        circle.setAttribute('cy', y.toFixed(2));
+        circle.setAttribute('r', '6');
+        circle.setAttribute('fill', metric.color);
+        circle.setAttribute('tabindex', '0');
+        circle.setAttribute('aria-label', `${getDayShort(d.created_at)}: ${d[metricKey]}${metric.unit}`);
+        svg.appendChild(circle);
+      });
+
+      labelsContainer.innerHTML = '';
+      demoData.forEach((d) => {
+        const day = getDayShort(d.created_at);
+        const val = d[metricKey];
+        const valText =
+          metricKey === 'ph' ? val.toFixed(2) : `${val}${metric.unit}`;
+        const btn = document.createElement('button');
+        btn.className = 'clickable';
+        btn.setAttribute('aria-label', `${day} ${valText}`);
+        btn.type = 'button';
+        btn.innerHTML = `
+          <div class="text-[10px] font-semibold">${day}</div>
+          <div class="text-xs mt-1">${valText}</div>
+        `;
+        labelsContainer.appendChild(btn);
+      });
+    }
+
+    tabTemperature.addEventListener('click', () => {
+      currentMetric = 'temperature';
+      drawChart(currentMetric);
+      setActiveTab(currentMetric);
+    });
+    tabHumidity.addEventListener('click', () => {
+      currentMetric = 'humidity';
+      drawChart(currentMetric);
+      setActiveTab(currentMetric);
+    });
+    tabPh.addEventListener('click', () => {
+      currentMetric = 'ph';
+      drawChart(currentMetric);
+      setActiveTab(currentMetric);
+    });
+
+    function setActiveTab(metricKey) {
+      [tabTemperature, tabHumidity, tabPh].forEach((tab) => {
+        tab.classList.remove('text-[#7B8BD4]', 'font-bold', 'border-b-2', 'border-[#7B8BD4]');
+        tab.classList.add('text-[#A3A9D1]', 'font-semibold');
+      });
+      let activeTab;
+      if (metricKey === 'temperature') activeTab = tabTemperature;
+      else if (metricKey === 'humidity') activeTab = tabHumidity;
+      else if (metricKey === 'ph') activeTab = tabPh;
+      if (activeTab) {
+        activeTab.classList.remove('text-[#A3A9D1]', 'font-semibold');
+        activeTab.classList.add('text-[#7B8BD4]', 'font-bold', 'border-b-2', 'border-[#7B8BD4]');
+      }
+    }
+
+    function init() {
+      const sorted = [...demoData].sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+      );
+      const latest = sorted[0];
+      updateLatestData(latest);
+      setActiveTab(currentMetric);
+      drawChart(currentMetric);
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+ </body>
+</html>

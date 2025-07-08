@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+button:focus {
+  outline: 2px solid #7B8BD4;
+  outline-offset: 2px;
+}
+
+.clickable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.clickable:focus,
+.clickable:hover {
+  background-color: rgba(123, 139, 212, 0.2);
+  border-radius: 0.5rem;
+  outline: none;
+}
