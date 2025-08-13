@@ -75,6 +75,13 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
 
+  // ✅ Tambahkan fungsi logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    window.location.href = "/login"; // ganti path sesuai kebutuhanmu
+  };
+
   const fetchData = () => {
     axios
       .get("http://localhost:5000/api/data")
@@ -84,7 +91,7 @@ const Home = () => {
         setLatestData(latest);
         setDemoData(sorted.slice(0, 10).reverse());
         setLoading(false);
-        if (latest.Rekomendasi !== "Optimal") {
+        if (latest?.Rekomendasi !== "Optimal") {
           setShowPopup(true);
         }
       })
@@ -114,7 +121,7 @@ const Home = () => {
             const date = new Date(value);
             const tanggal = date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
             const jam = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
-            return `${tanggal} ${jam}`; // Contoh: "05 Jul 08:00"
+            return `${tanggal} ${jam}`;
           }}
           tick={{ fontSize: 10 }}
         />
@@ -135,12 +142,16 @@ const Home = () => {
       </LineChart>
     </ResponsiveContainer>
   );
-    
+
+  // ✅ Tambahkan fallback jika latestData belum ada
+  if (!latestData && !loading) {
+    return <div className="p-6 text-gray-500">Tidak ada data yang tersedia.</div>;
+  }
+
   return (
     <div className="bg-[#F9FAFF] min-h-screen flex justify-center items-start px-4 sm:px-6 lg:px-8 py-6">
       <div className="w-full max-w-6xl bg-white rounded-xl shadow-md p-4 sm:p-6">
 
-        {/* Popup Warning */}
         {showPopup && latestData?.Rekomendasi !== 'Optimal' && (
           <div className="fixed top-1/2 left-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 bg-red-50 text-red-700 p-6 rounded-xl shadow-xl text-center w-80">
             <div className="flex justify-end">
@@ -149,16 +160,13 @@ const Home = () => {
               </button>
             </div>
             <AlertTriangle className="mx-auto w-10 h-10 text-red-500 mb-2 animate-bounce" />
-
             <h2 className="text-lg font-bold mb-1">{latestData?.Rekomendasi}</h2>
-
             <div className="flex justify-center mb-2 animate-pulse">
               {getIconByRecommendationPopup(latestData?.Rekomendasi)}
             </div>
           </div>
         )}
 
-        {/* Header */}
         <header className="flex flex-wrap justify-center sm:justify-between items-center gap-4 mb-6">
           <nav className="flex flex-wrap justify-center space-x-6">
             <Link
@@ -169,18 +177,15 @@ const Home = () => {
             >
               Home
             </Link>
-            <Link
-              to="/kmeans"
-              className={`text-sm sm:text-base font-semibold ${
-                location.pathname === "/kmeans" ? "font-bold text-[#7B8BD4]" : "text-[#A3A9D1]"
-              }`}
+            <button
+              onClick={handleLogout}
+              className="text-red-500 font-semibold ml-4"
             >
-              K-Means
-            </Link>
+              Logout
+            </button>
           </nav>
         </header>
 
-        {/* Hero Section */}
         <section className="relative rounded-xl overflow-hidden bg-gradient-to-tr from-[#8B8EDC] via-[#B7B9E9] to-[#D9D9F3] p-6 h-52 sm:h-56 md:h-64 lg:h-72 mb-6">
           <img alt="Greenhouse" className="absolute inset-0 w-full h-full object-cover opacity-30" src={strawbery} />
           <div className="relative z-10 flex items-center space-x-4 text-white">
@@ -203,9 +208,7 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Sensor & Chart Section */}
         <section className="flex flex-col md:flex-row gap-6">
-          {/* Sensor Info */}
           <div className="md:w-1/3 space-y-4 text-[#7B8BD4] text-xs font-semibold">
             <div className="flex items-center space-x-2">
               <Droplet className="w-5 h-5" />
@@ -250,7 +253,6 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Chart Section */}
           <div className="md:w-2/3 bg-white rounded-xl p-4 sm:p-6 shadow-inner text-[#7B8BD4] text-xs font-semibold">
             <div className="flex justify-between mb-4 space-x-4">
               {['temperature', 'humidity', 'ph'].map((metric) => (

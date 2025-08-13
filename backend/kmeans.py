@@ -41,4 +41,11 @@ def run_kmeans(df_cleaned, n_clusters=4):
     df_cleaned['Rekomendasi Perawatan'] = df_cleaned.apply(rekomendasi_detail, axis=1)
     df_cleaned[['ph', 'humidity', 'temperature']] = df_cleaned[['ph', 'humidity', 'temperature']].round(1)
 
+    df_cleaned['Label_Aktual'] = df_cleaned['Rekomendasi'].map({
+        "Penyiraman": 0,
+        "Pemupukan": 1,
+        "Perlu Pengecekan": 2,
+        "Optimal": 3
+    })
+    
     return df_cleaned

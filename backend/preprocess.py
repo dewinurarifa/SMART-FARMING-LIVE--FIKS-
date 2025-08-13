@@ -36,6 +36,20 @@ def preprocess_data():
 
     df_numeric = df_resampled[["ph", "humidity", "temperature"]]
 
+    # # --- Hapus Outlier Menggunakan IQR ---
+    # def remove_outliers_iqr(df, columns):
+    #     df_clean = df.copy()
+    #     for col in columns:
+    #         Q1 = df_clean[col].quantile(0.25)
+    #         Q3 = df_clean[col].quantile(0.75)
+    #         IQR = Q3 - Q1
+    #         lower_bound = Q1 - 1.5 * IQR
+    #         upper_bound = Q3 + 1.5 * IQR
+    #         df_clean = df_clean[(df_clean[col] >= lower_bound) & (df_clean[col] <= upper_bound)]
+    #     return df_clean
+
+    # df = remove_outliers_iqr(df, ["humidity", "temperature", "ph"])
+    
     # Imputasi nilai yang hilang (jika ada)
     imputer = SimpleImputer(strategy='mean')
     df_numeric = pd.DataFrame(imputer.fit_transform(df_numeric), columns=df_numeric.columns)
